@@ -1,990 +1,671 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>零售管理知識挑戰賽</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html {
-      height: 100%;
-      overflow-y: auto;
-    }
-
-    body {
-      font-family: 'Noto Sans TC', 'Microsoft JhengHei', Arial, sans-serif;
-      background: linear-gradient(135deg, #1a237e 0%, #512da8 100%);
-      min-height: 100vh;
-      color: #fff;
-      overflow-y: auto;
-      padding-bottom: 20px;
-    }
-
-    .game-container {
-      max-width: 480px;
-      margin: 20px auto;
-      background: rgba(30, 34, 90, 0.85);
-      border-radius: 24px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
-      border: 1.5px solid rgba(110, 180, 255, 0.2);
-      position: relative;
-      overflow: visible;
-    }
-
-    .game-header {
-      background: linear-gradient(135deg, #0288d1 0%, #01579b 100%);
-      padding: 20px;
-      text-align: center;
-      border-radius: 24px 24px 0 0;
-      box-shadow: 0 4px 12px rgba(2, 136, 209, 0.3);
-    }
-
-    .game-title {
-      font-size: 1.8rem;
-      font-weight: 900;
-      color: #fff;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      margin-bottom: 5px;
-    }
-
-    .game-subtitle {
-      font-size: 1rem;
-      color: #b3e5fc;
-      font-weight: 400;
-    }
-
-    .content-area {
-      padding: 24px;
-    }
-
-    /* 歡迎頁面 */
-    .welcome-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 20px;
-      overflow-y: auto;
-    }
-
-    .welcome-content {
-      background: linear-gradient(135deg, rgba(30, 34, 90, 0.95) 0%, rgba(81, 45, 168, 0.95) 100%);
-      border-radius: 24px;
-      padding: 32px 24px;
-      max-width: 440px;
-      width: 100%;
-      border: 2px solid rgba(110, 180, 255, 0.3);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-      margin: auto;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .welcome-title {
-      font-size: 2rem;
-      font-weight: 900;
-      color: #fff;
-      text-align: center;
-      margin-bottom: 24px;
-      text-shadow: 0 0 12px #b388ff;
-    }
-
-    .welcome-section {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 16px;
-      border-left: 4px solid #00e5ff;
-    }
-
-    .welcome-section h3 {
-      font-size: 1.2rem;
-      color: #00e5ff;
-      margin-bottom: 10px;
-      font-weight: 700;
-    }
-
-    .welcome-section p, .welcome-section ul {
-      font-size: 1rem;
-      line-height: 1.6;
-      color: #e0e0e0;
-    }
-
-    .welcome-section ul {
-      padding-left: 20px;
-      margin-top: 8px;
-    }
-
-    .welcome-section li {
-      margin-bottom: 6px;
-    }
-
-    .start-btn {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(90deg, #0288d1 0%, #0277bd 100%);
-      color: #fff;
-      font-size: 1.3rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 16px;
-      cursor: pointer;
-      box-shadow: 0 4px 16px rgba(2, 136, 209, 0.4);
-      transition: all 0.3s;
-      margin-top: 8px;
-    }
-
-    .start-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(2, 136, 209, 0.6);
-    }
-
-    .start-btn:active {
-      transform: translateY(0);
-    }
-
-    /* 狀態欄 */
-    .status-bar {
-      display: flex;
-      justify-content: space-between;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .status-item {
-      flex: 1;
-      min-width: 100px;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 10px 8px;
-    }
-
-    .status-label {
-      font-size: 0.85rem;
-      color: #90caf9;
-      margin-bottom: 4px;
-    }
-
-    .status-value {
-      font-size: 1.3rem;
-      font-weight: bold;
-      color: #fff;
-      text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
-    }
-
-    /* 問題卡片 */
-    .question-card {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 20px;
-      border: 1px solid rgba(110, 180, 255, 0.2);
-    }
-
-    .question-number {
-      font-size: 1rem;
-      color: #00e5ff;
-      margin-bottom: 12px;
-      font-weight: 600;
-    }
-
-    .question-text {
-      font-size: 1.1rem;
-      line-height: 1.7;
-      color: #fff;
-      margin-bottom: 20px;
-      background: rgba(0, 0, 0, 0.2);
-      padding: 16px;
-      border-radius: 12px;
-      border-left: 4px solid #ff9800;
-      font-weight: 500;
-    }
-
-    /* 選項卡片 */
-    .options-container {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .option-card {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.08) 100%);
-      border-radius: 16px;
-      padding: 16px;
-      cursor: pointer;
-      transition: all 0.3s;
-      border: 2px solid transparent;
-      position: relative;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-    }
-
-    .option-card:hover {
-      transform: translateX(4px);
-      border-color: #00e5ff;
-      background: linear-gradient(135deg, rgba(0, 229, 255, 0.2) 0%, rgba(124, 77, 255, 0.2) 100%);
-    }
-
-    .option-card:active {
-      transform: translateX(2px);
-    }
-
-    .option-card.selected {
-      border-color: #00e5ff;
-      background: linear-gradient(135deg, rgba(0, 229, 255, 0.25) 0%, rgba(124, 77, 255, 0.25) 100%);
-      box-shadow: 0 0 16px rgba(0, 229, 255, 0.4);
-    }
-
-    .option-letter {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #00e5ff;
-      min-width: 30px;
-      height: 30px;
-      background: rgba(0, 229, 255, 0.2);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .option-text {
-      font-size: 1rem;
-      color: #e0e0e0;
-      line-height: 1.5;
-      flex: 1;
-    }
-
-    /* 確認按鈕 */
-    .confirm-btn {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(90deg, #7c4dff 0%, #00bcd4 100%);
-      color: #fff;
-      font-size: 1.2rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 16px;
-      cursor: pointer;
-      box-shadow: 0 4px 16px rgba(124, 77, 255, 0.4);
-      transition: all 0.3s;
-      margin-top: 20px;
-    }
-
-    .confirm-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(124, 77, 255, 0.6);
-    }
-
-    .confirm-btn:active:not(:disabled) {
-      transform: translateY(0);
-    }
-
-    .confirm-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* 結果頁面 */
-    .result-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      display: none;
-      align-items: flex-start;
-      justify-content: center;
-      z-index: 1000;
-      padding: 20px;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .result-content {
-      background: linear-gradient(135deg, rgba(30, 34, 90, 0.95) 0%, rgba(81, 45, 168, 0.95) 100%);
-      border-radius: 24px;
-      padding: 32px 24px;
-      max-width: 440px;
-      width: 100%;
-      border: 2px solid rgba(110, 180, 255, 0.3);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-      margin: 20px auto;
-      position: relative;
-    }
-
-    .result-title {
-      font-size: 2rem;
-      font-weight: 900;
-      color: #fff;
-      text-align: center;
-      margin-bottom: 16px;
-      text-shadow: 0 0 12px #b388ff;
-    }
-
-    .final-score {
-      text-align: center;
-      margin: 24px 0;
-    }
-
-    .score-number {
-      font-size: 4rem;
-      font-weight: 900;
-      color: #00e5ff;
-      text-shadow: 0 0 20px rgba(0, 229, 255, 0.6);
-    }
-
-    .score-label {
-      font-size: 1.2rem;
-      color: #90caf9;
-      margin-top: 8px;
-    }
-
-    .rating-badge {
-      background: linear-gradient(90deg, #0288d1 0%, #0277bd 100%);
-      color: #fff;
-      padding: 12px 24px;
-      border-radius: 24px;
-      font-size: 1.3rem;
-      font-weight: bold;
-      display: inline-block;
-      margin: 16px 0;
-      box-shadow: 0 4px 16px rgba(2, 136, 209, 0.4);
-    }
-
-    .rating-comment {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 20px;
-      margin: 20px 0;
-      border-left: 4px solid #00e5ff;
-    }
-
-    .rating-comment p {
-      font-size: 1rem;
-      line-height: 1.7;
-      color: #e0e0e0;
-      margin-bottom: 12px;
-    }
-
-    .rating-comment p:last-child {
-      margin-bottom: 0;
-    }
-
-    /* 答題回顧區域 */
-    .answers-review {
-      margin-top: 24px;
-    }
-
-    .answers-review h3 {
-      color: #fff176;
-      font-size: 1.3rem;
-      margin-bottom: 16px;
-      text-align: center;
-      font-weight: 700;
-    }
-
-    .answer-item {
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-
-    .answer-item.correct {
-      border-left: 4px solid #4caf50;
-    }
-
-    .answer-item.incorrect {
-      border-left: 4px solid #f44336;
-    }
-
-    .answer-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .answer-number {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #fff176;
-    }
-
-    .answer-status {
-      font-size: 0.9rem;
-      font-weight: 600;
-      padding: 4px 12px;
-      border-radius: 12px;
-    }
-
-    .answer-status.correct {
-      background: rgba(76, 175, 80, 0.3);
-      color: #4caf50;
-    }
-
-    .answer-status.incorrect {
-      background: rgba(244, 67, 54, 0.3);
-      color: #f44336;
-    }
-
-    .answer-question {
-      font-size: 0.9rem;
-      color: #b3e5fc;
-      margin-bottom: 8px;
-      line-height: 1.5;
-    }
-
-    .answer-detail {
-      font-size: 0.85rem;
-      color: #e0e0e0;
-      padding: 8px;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 8px;
-      margin-top: 8px;
-      line-height: 1.5;
-    }
-
-    .answer-your {
-      color: #ffab91;
-      margin-bottom: 6px;
-    }
-
-    .answer-correct {
-      color: #a5d6a7;
-      margin-bottom: 6px;
-    }
-
-    .answer-explanation {
-      color: #fff9c4;
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .restart-btn {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(90deg, #0288d1 0%, #0277bd 100%);
-      color: #fff;
-      font-size: 1.2rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 16px;
-      cursor: pointer;
-      box-shadow: 0 4px 16px rgba(2, 136, 209, 0.4);
-      transition: all 0.3s;
-      margin-top: 24px;
-    }
-
-    .restart-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(2, 136, 209, 0.6);
-    }
-
-    .restart-btn:active {
-      transform: translateY(0);
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    @media (max-width: 600px) {
-      .game-container {
-        margin: 10px;
-        border-radius: 16px;
-      }
-
-      .game-title {
-        font-size: 1.4rem;
-      }
-
-      .welcome-title, .result-title {
-        font-size: 1.6rem;
-      }
-
-      .status-bar {
-        gap: 8px;
-      }
-
-      .status-item {
-        min-width: 80px;
-      }
-
-      .score-number {
-        font-size: 3rem;
-      }
-
-      .welcome-content,
-      .result-content {
-        padding: 24px 20px;
-      }
-
-      .option-card {
-        padding: 14px;
-      }
-
-      .question-text {
-        font-size: 1rem;
-      }
-    }
-
-    @media (max-height: 700px) {
-      .welcome-content,
-      .result-content {
-        margin: 10px auto;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>零售與批發行銷大師：Ch11 知識挑戰賽</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* --- 視覺風格 (復刻 survey1.html & survey2.html) --- */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #1a237e 0%, #512da8 100%);
+            --glass-bg: rgba(30, 34, 90, 0.85);
+            --glass-border: rgba(110, 180, 255, 0.18);
+            --neon-blue: #00e5ff;
+            --neon-purple: #7c4dff;
+            --neon-yellow: #fff176;
+            --text-main: #ffffff;
+            --text-sub: #b3e5fc;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --accent-gradient: linear-gradient(90deg, #7c4dff 0%, #00bcd4 100%);
+            --success-color: #00e676;
+            --error-color: #ff5252;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* 背景紋理 */
+        .bg-pattern {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('https://www.transparenttextures.com/patterns/hexellence.png');
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 粒子動畫 */
+        .particle {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.6;
+            animation: float 6s infinite ease-in-out;
+            z-index: 0;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* --- 主容器 (Mobile First) --- */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background: rgba(20, 20, 40, 0.3);
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        /* --- Header --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            text-shadow: 0 0 8px var(--neon-purple);
+        }
+
+        .progress-badge {
+            background: rgba(0, 229, 255, 0.15);
+            color: var(--neon-blue);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            border: 1px solid var(--neon-blue);
+            font-weight: bold;
+        }
+
+        /* --- Quiz Area --- */
+        .quiz-card {
+            background: var(--glass-bg);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 32px rgba(80,100,255,0.18);
+            margin-bottom: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 24px;
+            line-height: 1.5;
+            color: #fff;
+            min-height: 60px;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 16px;
+            border-radius: 16px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover {
+            background: rgba(33, 150, 243, 0.2);
+            border-color: var(--neon-blue);
+        }
+
+        .option-btn.selected {
+            background: rgba(0, 229, 255, 0.2);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+        }
+
+        .btn-action {
+            margin-top: auto;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 14px 0;
+            font-size: 1.1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(124, 77, 255, 0.4);
+            font-weight: bold;
+            width: 100%;
+            transition: transform 0.2s;
+            text-align: center;
+        }
+
+        .btn-action:active { transform: scale(0.98); }
+        .btn-action:disabled { 
+            background: #555; 
+            cursor: not-allowed; 
+            box-shadow: none;
+            opacity: 0.6;
+        }
+
+        /* --- Modal & Overlays --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .modal-content {
+            width: 90%;
+            max-width: 420px;
+            background: linear-gradient(145deg, rgba(40, 44, 100, 0.95), rgba(20, 20, 60, 0.95));
+            border: 1px solid var(--neon-purple);
+            border-radius: 24px;
+            padding: 28px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(124, 77, 255, 0.3);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+            margin-bottom: 16px;
+            background: -webkit-linear-gradient(90deg, #00e5ff, #b388ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .info-block {
+            text-align: left;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.05);
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 4px solid var(--neon-blue);
+        }
+        .info-label { color: var(--neon-blue); font-weight: bold; margin-bottom: 6px; font-size: 0.9rem; }
+        .info-text { color: #e0e0e0; font-size: 0.95rem; line-height: 1.5; }
+
+        /* --- Result Page Styles --- */
+        .result-score-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 20px auto;
+        }
+        .score-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.2rem; /* 稍微縮小字體以容納100分 */
+            font-weight: 900;
+            color: var(--neon-yellow);
+            text-shadow: 0 0 10px rgba(255, 241, 118, 0.6);
+        }
+        
+        .feedback-text {
+            font-size: 1.1rem;
+            color: #fff;
+            margin-bottom: 24px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .review-list {
+            text-align: left;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .review-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .review-item.correct { border-left: 4px solid var(--success-color); }
+        .review-item.wrong { border-left: 4px solid var(--error-color); }
+
+        .review-q { font-weight: bold; margin-bottom: 8px; color: #fff; }
+        .review-a { font-size: 0.9rem; color: #bdbdbd; margin-bottom: 4px; }
+        .review-exp { 
+            font-size: 0.85rem; 
+            color: var(--text-sub); 
+            margin-top: 8px; 
+            background: rgba(0, 229, 255, 0.1); 
+            padding: 8px; 
+            border-radius: 8px; 
+        }
+
+    </style>
 </head>
 <body>
-  <!-- 歡迎頁面 -->
-  <div class="welcome-modal" id="welcomeModal">
-    <div class="welcome-content">
-      <h1 class="welcome-title">🏪 零售管理知識挑戰賽</h1>
-      
-      <div class="welcome-section">
-        <h3>🎯 挑戰目標</h3>
-        <p>本測驗涵蓋零售與批發管理的核心概念，包括零售商類型、全通路零售、零售行銷決策、零售趨勢及批發商角色等重要主題。透過10道精心設計的題目，檢驗您對現代零售管理理論與實務的掌握程度。</p>
-      </div>
 
-      <div class="welcome-section">
-        <h3>🎮 操作方式</h3>
-        <ul>
-          <li>共有10道選擇題，每題10分</li>
-          <li>仔細閱讀題目與各選項</li>
-          <li>點選您認為正確的答案</li>
-          <li>確認後自動進入下一題</li>
-          <li>完成所有題目後查看成績</li>
-        </ul>
-      </div>
+    <div class="bg-pattern"></div>
+    <div class="particle" style="width:12px; height:12px; top:15%; left:10%; background:var(--neon-blue);"></div>
+    <div class="particle" style="width:18px; height:18px; top:60%; left:85%; background:var(--neon-purple); animation-delay: 1s;"></div>
+    <div class="particle" style="width:8px; height:8px; top:30%; left:50%; background:var(--neon-yellow); animation-delay: 2s;"></div>
+    <div class="particle" style="width:10px; height:10px; top:80%; left:20%; background:#ff4081; animation-delay: 3s;"></div>
 
-      <div class="welcome-section">
-        <h3>📚 學習成果</h3>
-        <ul>
-          <li>理解零售商在配銷通路中的角色</li>
-          <li>掌握全通路零售的核心概念</li>
-          <li>熟悉零售商的行銷決策要素</li>
-          <li>了解現代零售業的發展趨勢</li>
-          <li>認識批發商的類型與功能</li>
-        </ul>
-      </div>
+    <div class="app-container">
+        <div class="modal-overlay active" id="welcome-modal">
+            <div class="modal-content">
+                <div class="modal-title">行銷知識挑戰賽</div>
+                
+                <div class="info-block">
+                    <div class="info-label">🎯 挑戰目標</div>
+                    <div class="info-text">測試您對行銷學第11章「零售與批發 (Retailing and Wholesaling)」的掌握程度，共20道精選試題。</div>
+                </div>
 
-      <button class="start-btn" onclick="startQuiz()">開始挑戰 🚀</button>
-    </div>
-  </div>
+                <div class="info-block">
+                    <div class="info-label">🎮 操作方式</div>
+                    <div class="info-text">點擊選項回答問題，每題5分，總分100分。答題後無法修改，請謹慎選擇。</div>
+                </div>
 
-  <!-- 測驗主體 -->
-  <div class="game-container hidden" id="quizContainer">
-    <div class="game-header">
-      <h1 class="game-title">🏪 零售管理知識挑戰</h1>
-      <p class="game-subtitle">Marketing Chapter 11</p>
-    </div>
+                <div class="info-block">
+                    <div class="info-label">🏆 學習成果</div>
+                    <div class="info-text">強化對零售商類型、全通路行銷、零售行銷決策及批發商職能的理解。</div>
+                </div>
 
-    <div class="content-area">
-      <!-- 狀態欄 -->
-      <div class="status-bar">
-        <div class="status-item">
-          <div class="status-label">當前題目</div>
-          <div class="status-value" id="currentQuestion">1/10</div>
+                <button class="btn-action" onclick="startGame()">開始測驗</button>
+            </div>
         </div>
-        <div class="status-item">
-          <div class="status-label">答對題數</div>
-          <div class="status-value" id="correctCount">0</div>
+
+        <div id="game-ui" style="display: none; height: 100%; flex-direction: column; flex:1;">
+            <div class="header">
+                <div class="header-title">CH11: Retailing & Wholesaling</div>
+                <div class="progress-badge" id="progress-text">Q 1/20</div>
+            </div>
+
+            <div class="quiz-card">
+                <div class="question-text" id="question-text">題目載入中...</div>
+                <div class="options-container" id="options-container">
+                    </div>
+            </div>
+
+            <button class="btn-action" id="next-btn" onclick="nextQuestion()" disabled>下一題</button>
         </div>
-        <div class="status-item">
-          <div class="status-label">目前分數</div>
-          <div class="status-value" id="currentScore">0</div>
+
+        <div class="modal-overlay" id="result-modal">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-title">測驗結果</div>
+                
+                <div class="result-score-container">
+                    <canvas id="scoreChart"></canvas>
+                    <div class="score-text" id="final-score">0</div>
+                </div>
+
+                <div class="feedback-text" id="final-feedback">評語載入中...</div>
+                
+                <div class="info-block" style="max-height: 300px; overflow-y: auto;">
+                    <div class="info-label">📝 答題詳解</div>
+                    <div class="review-list" id="review-list">
+                        </div>
+                </div>
+
+                <button class="btn-action" onclick="location.reload()">重新挑戰</button>
+            </div>
         </div>
-      </div>
 
-      <!-- 問題卡片 -->
-      <div class="question-card" id="questionCard">
-        <div class="question-number" id="questionNumber"></div>
-        <div class="question-text" id="questionText"></div>
-        <div class="options-container" id="optionsContainer"></div>
-        <button class="confirm-btn" id="confirmBtn" onclick="confirmAnswer()" disabled>確認答案</button>
-      </div>
     </div>
-  </div>
 
-  <!-- 結果頁面 -->
-  <div class="result-modal" id="resultModal">
-    <div class="result-content">
-      <h1 class="result-title">🎊 測驗成績報告</h1>
-      
-      <div class="final-score">
-        <div class="score-number" id="finalScore">0</div>
-        <div class="score-label">總分</div>
-      </div>
+    <script>
+        // --- 題庫資料 (基於 Ch11.pdf) ---
+        const questionsSource = [
+            {
+                q: "「零售 (Retailing)」的主要定義是什麼？",
+                a: "將商品或服務直接銷售給最終消費者以供個人使用的所有活動",
+                options: ["將商品或服務直接銷售給最終消費者以供個人使用的所有活動", "將商品大量銷售給企業用戶進行轉售的活動", "製造商直接生產商品並儲存的過程", "僅限於在實體商店內進行的商品交換行為"],
+                exp: "根據 Ch11，零售涉及將商品或服務直接銷售給最終消費者供其個人、非商業用途的所有活動。"
+            },
+            {
+                q: "什麼是「全通路零售 (Omni-channel retailing)」的核心概念？",
+                a: "創造整合店內、線上及行動購物的無縫跨通路購買體驗",
+                options: ["創造整合店內、線上及行動購物的無縫跨通路購買體驗", "專注於單一最強勢的銷售通路以極大化利潤", "完全放棄實體店面，轉向純電商經營", "將不同通路的庫存與行銷活動完全獨立運作"],
+                exp: "全通路零售旨在整合店內、線上和移動購物，為消費者創造無縫的跨通路購買體驗。"
+            },
+            {
+                q: "關於「專賣店 (Specialty store)」，下列描述何者正確？",
+                a: "銷售狹窄的產品線，但在該產品線中擁有深度的產品組合",
+                options: ["銷售狹窄的產品線，但在該產品線中擁有深度的產品組合", "銷售廣泛的產品線，但每種產品的選擇有限", "以低利潤、高周轉率的方式銷售日常用品", "主要銷售食品和非食品類的家庭用品，規模巨大"],
+                exp: "專賣店 (如 REI, Sephora) 的特徵是產品線窄 (Narrow product line) 但組合深 (Deep assortment)。"
+            },
+            {
+                q: "下列哪種類型的零售商特徵是「相對較大、低成本、低利潤、高銷量、自助式」？",
+                a: "超級市場 (Supermarket)",
+                options: ["超級市場 (Supermarket)", "便利商店 (Convenience store)", "專賣店 (Specialty store)", "百貨公司 (Department store)"],
+                exp: "這是超級市場 (如 Kroger, Publix) 的標準定義：大型、低成本、低利潤、高銷量且自助式。"
+            },
+            {
+                q: "像 7-Eleven 這樣位於住宅區附近、全天候營業並銷售高周轉率商品的商店屬於？",
+                a: "便利商店 (Convenience store)",
+                options: ["便利商店 (Convenience store)", "超級商店 (Superstore)", "折扣店 (Discount store)", "暢貨中心 (Factory outlet)"],
+                exp: "便利商店規模較小，靠近住宅區，長時間營業，主打高周轉率的便利商品。"
+            },
+            {
+                q: "什麼是「品類殺手 (Category Killer)」？",
+                a: "在特定類別中提供極深產品組合的大型專賣店",
+                options: ["在特定類別中提供極深產品組合的大型專賣店", "銷售過季商品或次級品的零售商", "由製造商直接擁有的零售據點", "收取會員費並以批發價銷售商品的俱樂部"],
+                exp: "品類殺手 (如 Best Buy, Petco) 是大型專賣店，在特定類別中擁有極深的產品組合，常使同類別的小店難以生存。"
+            },
+            {
+                q: "以低於正常批發價購買商品，並以低於零售價銷售的零售商稱為？",
+                a: "降價零售商 (Off-price retailer)",
+                options: ["降價零售商 (Off-price retailer)", "折扣店 (Discount store)", "百貨公司 (Department store)", "超級商店 (Superstore)"],
+                exp: "降價零售商 (如 TJ Maxx, Costco) 的特徵是以低於正常批發價進貨，並以低於一般零售價銷售。"
+            },
+            {
+                q: "由製造商擁有和經營，通常銷售自家過剩、停產或不規律商品的降價零售業務是？",
+                a: "工廠直營店 (Factory outlet)",
+                options: ["工廠直營店 (Factory outlet)", "獨立降價零售商", "倉儲俱樂部", "連鎖便利店"],
+                exp: "Factory outlet 是由製造商擁有和經營的降價零售業務。"
+            },
+            {
+                q: "關於「加盟組織 (Franchise organization)」，下列敘述何者正確？",
+                a: "加盟主是購買擁有和經營權的獨立商人",
+                options: ["加盟主是購買擁有和經營權的獨立商人", "所有分店皆由總公司直接擁有與管理", "是一種由批發商發起的自願連鎖體系", "主要由農產品生產者組成"],
+                exp: "加盟是特許人與加盟主之間的契約關係，加盟主是購買經營權的獨立商人 (如 McDonald's, Subway)。"
+            },
+            {
+                q: "零售行銷決策的第一步通常是？",
+                a: "零售區隔與目標市場選擇 (Retail segmentation and targeting)",
+                options: ["零售區隔與目標市場選擇 (Retail segmentation and targeting)", "決定商店氣氛", "設定促銷預算", "選擇店面位置"],
+                exp: "零售商必須先定義目標市場並進行區隔，才能決定如何在市場中進行差異化與定位。"
+            },
+            {
+                q: "零售商的產品組合 (Product assortment) 決策中，不僅要決定產品種類，還需要考慮？",
+                a: "服務組合 (Services mix) 與 商店氣氛 (Store atmosphere)",
+                options: ["服務組合 (Services mix) 與 商店氣氛 (Store atmosphere)", "批發商的物流成本", "全球經濟趨勢", "製造商的生產流程"],
+                exp: "零售商的產品變數包括：產品組合、服務組合以及商店氣氛。"
+            },
+            {
+                q: "Costco 或 Aldi 這類零售商主要採用的價格策略是？",
+                a: "每日低價 (EDLP)",
+                options: ["每日低價 (EDLP)", "高低定價 (High-low pricing)", "掠奪式定價", "撇脂定價"],
+                exp: "EDLP (Everyday Low Pricing) 強調持續的低價，而非頻繁的短期促銷 (High-low)。"
+            },
+            {
+                q: "購物中心 (Shopping center) 的定義是？",
+                a: "作為一個單位進行規劃、開發、擁有和管理的一組零售業務",
+                options: ["作為一個單位進行規劃、開發、擁有和管理的一組零售業務", "位於市中心的單一大型百貨公司", "沿著高速公路自然聚集的商店群", "僅存在於網路上的虛擬商城"],
+                exp: "購物中心是作為一個整體單位來規劃、開發和管理的零售聚落。"
+            },
+            {
+                q: "「批發 (Wholesaling)」的主要活動對象是？",
+                a: "為了轉售或商業使用而購買的人",
+                options: ["為了轉售或商業使用而購買的人", "最終個人消費者", "僅限於政府機構", "僅限於國外進口商"],
+                exp: "批發涉及將商品銷售給為了轉售 (Resale) 或商業使用 (Business use) 的買家。"
+            },
+            {
+                q: "下列哪一項**不是**批發商通常執行的通路功能？",
+                a: "直接製造產品 (Manufacturing)",
+                options: ["直接製造產品 (Manufacturing)", "拆箱/散裝 (Bulk breaking)", "倉儲 (Warehousing)", "融資 (Financing)"],
+                exp: "批發商的功能包括銷售、購買、拆箱、倉儲、運輸、融資、風險承擔等，但不包括製造。"
+            },
+            {
+                q: "「商人批發商 (Merchant wholesaler)」與經紀人/代理商最大的區別在於？",
+                a: "商人批發商擁有商品所有權 (Take title to goods)",
+                options: ["商人批發商擁有商品所有權 (Take title to goods)", "商人批發商不處理實體商品", "商人批發商僅服務於農業市場", "經紀人擁有商品所有權"],
+                exp: "Merchant wholesalers 是獨立擁有的企業，擁有其處理商品的所有權；經紀人與代理商則不擁有所有權。"
+            },
+            {
+                q: "不擁有商品所有權，主要功能是促成買賣雙方交易並收取佣金的是？",
+                a: "經紀人 (Broker)",
+                options: ["經紀人 (Broker)", "工業經銷商", "卡車批發商", "直運商 (Drop shippers)"],
+                exp: "經紀人 (Broker) 不擁有商品，主要功能是媒合買賣雙方並協助談判。"
+            },
+            {
+                q: "代表買方或賣方，且關係較為「長期」的批發中間人稱為？",
+                a: "代理商 (Agent)",
+                options: ["代理商 (Agent)", "經紀人 (Broker)", "零售商", "供應商"],
+                exp: "代理商 (Agent) 與買賣雙方的關係比經紀人更為長期且穩定。"
+            },
+            {
+                q: "收到訂單後，選擇製造商並由製造商直接出貨給客戶，自己不經手庫存的批發商是？",
+                a: "直運商 (Drop shipper)",
+                options: ["直運商 (Drop shipper)", "貨架批發商 (Rack jobber)", "卡車批發商 (Truck wholesaler)", "現金自運批發商"],
+                exp: "Drop shippers 收到訂單後由製造商直發，不處理庫存或實體商品。"
+            },
+            {
+                q: "近年來零售業的主要趨勢之一是？",
+                a: "大型零售商 (Megaretailers) 的崛起與零售科技的增長",
+                options: ["大型零售商 (Megaretailers) 的崛起與零售科技的增長", "完全回歸傳統的小型雜貨店模式", "批發商完全取代零售商的角色", "停止全球擴張以專注本地市場"],
+                exp: "Ch11 提到的趨勢包括大型零售商崛起、直效/線上/行動零售增長、零售科技的重要性增加、綠色零售及全球擴張。"
+            }
+        ];
 
-      <div style="text-align: center;">
-        <span class="rating-badge" id="ratingBadge"></span>
-      </div>
+        // --- 遊戲狀態 ---
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let correctCount = 0; // 記錄答對題數
+        let userAnswers = []; // 儲存用戶的答題記錄 {q, selected, correct, isCorrect, exp}
 
-      <div class="rating-comment" id="ratingComment"></div>
+        // --- 核心邏輯函數 ---
 
-      <!-- 答題回顧區域 -->
-      <div class="answers-review">
-        <h3>📋 詳細答題結果</h3>
-        <div id="answersReviewContainer"></div>
-      </div>
-
-      <button class="restart-btn" onclick="restartQuiz()">重新挑戰</button>
-    </div>
-  </div>
-
-  <script>
-    // 測驗數據
-    const quizData = {
-      questions: [
-        {
-          question: "UNIQLO將自己定位為世界上唯一的「生活服飾」品牌，這種定位策略主要強調什麼？",
-          options: [
-            "高價奢華的時尚體驗",
-            "高品質、時尚、實惠且舒適的日常服裝",
-            "限量版的獨家設計",
-            "專注於運動服飾市場"
-          ],
-          correct: 1,
-          explanation: "UNIQLO的「生活服飾」定位強調的是高品質、時尚、實惠且舒適的日常服裝，這是其核心品牌價值。"
-        },
-        {
-          question: "「全通路零售」(Omni-channel Retailing) 的核心概念是什麼？",
-          options: [
-            "只專注於實體店面銷售",
-            "創造無縫的跨通路購物體驗，整合實體店、線上和行動購物",
-            "完全取消實體店面，只做線上銷售",
-            "將不同通路完全獨立運作"
-          ],
-          correct: 1,
-          explanation: "全通路零售的核心是創造無縫的跨通路購物體驗，整合實體店、線上和行動購物，讓顧客可以自由切換購物管道。"
-        },
-        {
-          question: "根據服務程度分類，下列哪一種零售商提供最完整的銷售協助？",
-          options: [
-            "自助式零售商 (Self-service retailers)",
-            "有限服務零售商 (Limited-service retailers)",
-            "全方位服務零售商 (Full-service retailers)",
-            "折扣商店 (Discount stores)"
-          ],
-          correct: 2,
-          explanation: "全方位服務零售商提供最完整的銷售協助，在購物過程的每個階段都協助顧客，通常銷售較多專業商品。"
-        },
-        {
-          question: "「專賣店」(Specialty Store) 的主要特色是什麼？",
-          options: [
-            "販售各種不同類別的商品",
-            "在特定產品線中提供狹窄但深入的選擇",
-            "以最低價格為主要訴求",
-            "只在線上銷售商品"
-          ],
-          correct: 1,
-          explanation: "專賣店的特色是在特定產品線中提供狹窄但深入的選擇，如REI、Sunglass Hut、Sephora等都是專賣店的例子。"
-        },
-        {
-          question: "「購物者行銷」(Shopper Marketing) 主要聚焦在什麼時機？",
-          options: [
-            "顧客購買前的廣告宣傳階段",
-            "顧客接近購買點時，將購物者轉變為買家",
-            "顧客購買後的售後服務",
-            "顧客使用產品的體驗階段"
-          ],
-          correct: 1,
-          explanation: "購物者行銷聚焦在將整個行銷過程導向當購物者接近購買點時，將其轉變為買家的關鍵時刻。"
-        },
-        {
-          question: "零售商的主要行銷決策包括哪些要素？",
-          options: [
-            "只需要考慮產品和價格",
-            "產品組合、服務、店面氛圍、價格、促銷和地點",
-            "只需要專注於促銷活動",
-            "只需要選擇好的地點"
-          ],
-          correct: 1,
-          explanation: "零售商需要做出多方面的行銷決策，包括產品組合、服務、店面氛圍、價格、促銷和地點等綜合要素。"
-        },
-        {
-          question: "「百貨公司」(Department Store) 的主要特徵是什麼？",
-          options: [
-            "只販售單一類別商品",
-            "販售多種產品線，每個產品線都作為獨立部門運作",
-            "以低價為主要競爭策略",
-            "只提供自助式服務"
-          ],
-          correct: 1,
-          explanation: "百貨公司的特徵是販售多種產品線（如服裝、家居用品、化妝品），每個產品線都作為獨立部門運作，如Macy's、Nordstrom等。"
-        },
-        {
-          question: "現代零售業的主要發展趨勢不包括下列哪一項？",
-          options: [
-            "全通路零售的興起",
-            "數位科技的深度應用",
-            "完全放棄實體店面",
-            "體驗式零售的重視"
-          ],
-          correct: 2,
-          explanation: "現代零售趨勢強調全通路整合，而非完全放棄實體店面。實體店面仍扮演重要角色，但需要與線上通路整合。"
-        },
-        {
-          question: "批發商 (Wholesaler) 在配銷通路中的主要角色是什麼？",
-          options: [
-            "直接銷售商品給最終消費者",
-            "從製造商處購買商品，再轉售給零售商、企業用戶或其他批發商",
-            "只負責商品的製造生產",
-            "只提供廣告行銷服務"
-          ],
-          correct: 1,
-          explanation: "批發商的主要角色是從製造商處購買商品，再轉售給零售商、企業用戶或其他批發商，而非直接銷售給最終消費者。"
-        },
-        {
-          question: "「超市」(Supermarket) 的經營特色是什麼？",
-          options: [
-            "高價位的精品商店",
-            "大型、低成本、低毛利、高銷量的自助式商店",
-            "專門販售奢侈品",
-            "只提供全方位個人化服務"
-          ],
-          correct: 1,
-          explanation: "超市的特色是大型、低成本、低毛利、高銷量的自助式商店，主要販售食品、洗衣用品和家居用品等日常必需品。"
+        // 洗牌演算法 (Fisher-Yates)
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
         }
-      ]
-    };
 
-    // 測驗狀態
-    let currentQuestionIndex = 0;
-    let correctAnswers = 0;
-    let totalScore = 0;
-    let selectedOption = null;
-    let userAnswers = []; // 儲存使用者的答題記錄
+        // 初始化遊戲
+        function startGame() {
+            // 1. 隱藏歡迎頁，顯示遊戲頁
+            document.getElementById('welcome-modal').classList.remove('active');
+            document.getElementById('game-ui').style.display = 'flex';
+            
+            // 2. 準備題目 (雖說是固定20題，但選項需要隨機)
+            // 複製題庫以免汙染源資料
+            currentQuestions = JSON.parse(JSON.stringify(questionsSource));
+            
+            // 選項隨機化
+            currentQuestions.forEach(q => {
+                q.shuffledOptions = shuffle([...q.options]);
+            });
 
-    // 開始測驗
-    function startQuiz() {
-      document.getElementById('welcomeModal').style.display = 'none';
-      document.getElementById('quizContainer').classList.remove('hidden');
-      window.scrollTo(0, 0);
-      userAnswers = []; // 重置答題記錄
-      loadQuestion(0);
-    }
-
-    // 載入題目
-    function loadQuestion(index) {
-      if (index >= quizData.questions.length) {
-        showResults();
-        return;
-      }
-
-      currentQuestionIndex = index;
-      selectedOption = null;
-      
-      const question = quizData.questions[index];
-      
-      document.getElementById('currentQuestion').textContent = `${index + 1}/10`;
-      document.getElementById('questionNumber').textContent = `第 ${index + 1} 題`;
-      document.getElementById('questionText').textContent = question.question;
-      
-      const optionsContainer = document.getElementById('optionsContainer');
-      optionsContainer.innerHTML = '';
-      
-      const letters = ['A', 'B', 'C', 'D'];
-      question.options.forEach((option, i) => {
-        const optionCard = document.createElement('div');
-        optionCard.className = 'option-card';
-        optionCard.onclick = () => selectOption(i);
-        optionCard.innerHTML = `
-          <div class="option-letter">${letters[i]}</div>
-          <div class="option-text">${option}</div>
-        `;
-        optionsContainer.appendChild(optionCard);
-      });
-      
-      document.getElementById('confirmBtn').disabled = true;
-      window.scrollTo(0, 0);
-    }
-
-    // 選擇選項
-    function selectOption(index) {
-      selectedOption = index;
-      
-      const cards = document.querySelectorAll('.option-card');
-      cards.forEach((card, i) => {
-        if (i === index) {
-          card.classList.add('selected');
-        } else {
-          card.classList.remove('selected');
+            // 3. 重置狀態
+            currentIndex = 0;
+            correctCount = 0; // 重置答對題數
+            userAnswers = [];
+            
+            // 4. 渲染第一題
+            renderQuestion();
         }
-      });
-      
-      document.getElementById('confirmBtn').disabled = false;
-    }
 
-    // 確認答案
-    function confirmAnswer() {
-      if (selectedOption === null) return;
-      
-      const question = quizData.questions[currentQuestionIndex];
-      const isCorrect = selectedOption === question.correct;
-      
-      // 記錄答題結果
-      userAnswers.push({
-        questionIndex: currentQuestionIndex,
-        question: question.question,
-        userAnswer: selectedOption,
-        correctAnswer: question.correct,
-        isCorrect: isCorrect,
-        options: question.options,
-        explanation: question.explanation
-      });
-      
-      if (isCorrect) {
-        correctAnswers++;
-        totalScore += 10;
-      }
-      
-      document.getElementById('correctCount').textContent = correctAnswers;
-      document.getElementById('currentScore').textContent = totalScore;
-      
-      setTimeout(() => {
-        loadQuestion(currentQuestionIndex + 1);
-      }, 300);
-    }
+        function renderQuestion() {
+            const qData = currentQuestions[currentIndex];
+            
+            // 更新進度
+            document.getElementById('progress-text').innerText = `Q ${currentIndex + 1}/${currentQuestions.length}`;
+            
+            // 更新題目
+            document.getElementById('question-text').innerText = qData.q;
+            
+            // 更新選項
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = '';
+            
+            qData.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => selectOption(btn, opt);
+                optsContainer.appendChild(btn);
+            });
 
-    // 顯示結果
-    function showResults() {
-      document.getElementById('quizContainer').classList.add('hidden');
-      const resultModal = document.getElementById('resultModal');
-      resultModal.style.display = 'flex';
-      resultModal.scrollTop = 0;
-      window.scrollTo(0, 0);
-      
-      document.getElementById('finalScore').textContent = totalScore;
-      
-      let rating, comment;
-      
-      if (totalScore >= 90) {
-        rating = "🏆 零售管理專家";
-        comment = `
-          <p><strong>卓越表現！您是零售管理的專家！</strong></p>
-          <p>您對零售與批發管理的核心概念有深入且全面的理解。從全通路零售的策略思維，到零售商類型的精準分類，再到現代零售趨勢的掌握，您都展現了專業水準。</p>
-          <p>您已經完全掌握了零售商在配銷通路中的角色、行銷決策要素，以及批發商的功能。這些知識將幫助您在實務中做出明智的零售策略決策。</p>
-          <p><strong>建議：</strong>持續關注零售業的數位轉型趨勢，特別是AI、大數據在零售業的應用，將理論與實務結合，成為引領零售創新的領導者。</p>
-        `;
-      } else if (totalScore >= 70) {
-        rating = "⭐ 零售管理達人";
-        comment = `
-          <p><strong>優秀表現！您對零售管理有良好的掌握。</strong></p>
-          <p>您理解零售業的基本概念和運作模式，對全通路零售、零售商類型等核心主題有清晰的認識。您已經建立了扎實的零售管理知識基礎。</p>
-          <p>在某些細節上，您可能需要更深入的理解，特別是零售商的行銷決策整合、現代零售趨勢的具體應用等方面。</p>
-          <p><strong>建議：</strong>多研究成功零售品牌的案例（如UNIQLO、Amazon等），分析他們如何整合線上線下通路，如何創造獨特的顧客體驗，將有助於提升您的實務應用能力。</p>
-        `;
-      } else if (totalScore >= 50) {
-        rating = "💼 零售管理學習者";
-        comment = `
-          <p><strong>您已經掌握了零售管理的基礎概念。</strong></p>
-          <p>您對零售業有基本的認識，但在一些重要概念上還需要加強理解，例如全通路零售的整合策略、不同零售商類型的特性差異、以及零售行銷決策的綜合考量。</p>
-          <p>建議您重新閱讀教材中關於零售商分類、全通路零售、購物者行銷等章節，特別注意各種零售形式的特點和適用情境。</p>
-          <p><strong>學習重點：</strong>理解零售業不只是「賣東西」，更是創造顧客價值和體驗的過程。多觀察身邊的零售商如何運作，思考他們的策略選擇背後的邏輯。</p>
-        `;
-      } else {
-        rating = "📚 零售管理新手";
-        comment = `
-          <p><strong>您需要更系統性地學習零售管理知識。</strong></p>
-          <p>零售管理涉及多個面向，包括通路策略、商品組合、定價、促銷、地點選擇等。建議您從基礎概念開始，循序漸進地建立知識體系。</p>
-          <p>重點複習以下主題：<br>
-          1. 零售商在配銷通路中的角色與功能<br>
-          2. 零售商的分類方式（服務程度、產品線、價格等）<br>
-          3. 全通路零售的概念與重要性<br>
-          4. 零售商的主要行銷決策要素<br>
-          5. 批發商的類型與功能</p>
-          <p><strong>學習建議：</strong>結合教材內容與實際案例，觀察不同類型零售商的運作方式，思考為什麼UNIQLO、Amazon等品牌能夠成功，這將幫助您更好地理解零售管理理論。</p>
-        `;
-      }
-      
-      document.getElementById('ratingBadge').textContent = rating;
-      document.getElementById('ratingComment').innerHTML = comment;
-      
-      // 顯示詳細答題結果
-      displayAnswersReview();
-    }
-
-    // 顯示答題回顧
-    function displayAnswersReview() {
-      const container = document.getElementById('answersReviewContainer');
-      container.innerHTML = '';
-      
-      const letters = ['A', 'B', 'C', 'D'];
-      
-      userAnswers.forEach((answer, index) => {
-        const answerItem = document.createElement('div');
-        answerItem.className = `answer-item ${answer.isCorrect ? 'correct' : 'incorrect'}`;
-        
-        const statusText = answer.isCorrect ? '✓ 答對了' : '✗ 答錯了';
-        const statusClass = answer.isCorrect ? 'correct' : 'incorrect';
-        
-        let detailHTML = `
-          <div class="answer-header">
-            <div class="answer-number">第 ${answer.questionIndex + 1} 題</div>
-            <div class="answer-status ${statusClass}">${statusText}</div>
-          </div>
-          <div class="answer-question">${answer.question}</div>
-          <div class="answer-detail">
-            <div class="answer-your"><strong>您的答案：</strong>${letters[answer.userAnswer]}. ${answer.options[answer.userAnswer]}</div>
-        `;
-        
-        if (!answer.isCorrect) {
-          detailHTML += `
-            <div class="answer-correct"><strong>正確答案：</strong>${letters[answer.correctAnswer]}. ${answer.options[answer.correctAnswer]}</div>
-          `;
+            // 禁用下一題按鈕
+            document.getElementById('next-btn').disabled = true;
         }
-        
-        detailHTML += `
-            <div class="answer-explanation"><strong>說明：</strong>${answer.explanation}</div>
-          </div>
-        `;
-        
-        answerItem.innerHTML = detailHTML;
-        container.appendChild(answerItem);
-      });
-    }
 
-    // 重新開始
-    function restartQuiz() {
-      currentQuestionIndex = 0;
-      correctAnswers = 0;
-      totalScore = 0;
-      selectedOption = null;
-      userAnswers = [];
-      
-      document.getElementById('resultModal').style.display = 'none';
-      document.getElementById('welcomeModal').style.display = 'flex';
-      
-      document.getElementById('correctCount').textContent = '0';
-      document.getElementById('currentScore').textContent = '0';
-      
-      window.scrollTo(0, 0);
-    }
-  </script>
+        let currentSelection = null;
+
+        function selectOption(btnElement, selectedText) {
+            // 清除之前的選擇樣式
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.classList.remove('selected'));
+            
+            // 添加當前選擇樣式
+            btnElement.classList.add('selected');
+            currentSelection = selectedText;
+            
+            // 啟用下一題按鈕
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        function nextQuestion() {
+            if (!currentSelection) return;
+
+            const qData = currentQuestions[currentIndex];
+            const isCorrect = (currentSelection === qData.a);
+            
+            if (isCorrect) correctCount++;
+
+            // 記錄答題狀況
+            userAnswers.push({
+                question: qData.q,
+                selected: currentSelection,
+                correctAnswer: qData.a,
+                isCorrect: isCorrect,
+                explanation: qData.exp
+            });
+
+            // 前進下一題或結束
+            currentIndex++;
+            currentSelection = null;
+
+            if (currentIndex < currentQuestions.length) {
+                renderQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('game-ui').style.display = 'none';
+            document.getElementById('result-modal').classList.add('active');
+            
+            // 計算總分 (1題5分)
+            const totalScore = correctCount * 5;
+            document.getElementById('final-score').innerText = totalScore;
+
+            // 評語邏輯 (100分制)
+            let feedback = "";
+            let color = "";
+            if (totalScore >= 90) {
+                feedback = "👑 零售大師 (Master)：\n太驚人了！您對零售與批發的概念掌握得爐火純青，簡直是教科書級別的表現！";
+                color = "#00e676"; // Green
+            } else if (totalScore >= 70) {
+                feedback = "🌟 優秀經理 (Expert)：\n表現優異！您對大部分核心概念都很清楚，稍加複習細節就能達到完美。";
+                color = "#00e5ff"; // Blue
+            } else if (totalScore >= 50) {
+                feedback = "💼 潛力新星 (Apprentice)：\n及格了！您掌握了基礎知識，但對於一些專有名詞和分類還需要再加強喔。";
+                color = "#ffd740"; // Yellow
+            } else {
+                feedback = "📚 新手實習 (Novice)：\n還需努力！建議您重新閱讀 Chapter 11，釐清零售商類型與批發功能的差異。";
+                color = "#ff5252"; // Red
+            }
+            const fbEl = document.getElementById('final-feedback');
+            fbEl.innerText = feedback;
+            fbEl.style.borderLeft = `4px solid ${color}`;
+            fbEl.style.paddingLeft = "10px";
+
+            // 繪製圓餅圖 (使用題數比例)
+            renderChart(correctCount, 20 - correctCount);
+
+            // 生成詳解列表
+            const list = document.getElementById('review-list');
+            list.innerHTML = '';
+            userAnswers.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = `review-item ${item.isCorrect ? 'correct' : 'wrong'}`;
+                div.innerHTML = `
+                    <div class="review-q">Q${idx+1}: ${item.question}</div>
+                    <div class="review-a">您的回答: ${item.selected} ${item.isCorrect ? '✅' : '❌'}</div>
+                    ${!item.isCorrect ? `<div class="review-a" style="color:var(--success-color)">正確答案: ${item.correctAnswer}</div>` : ''}
+                    <div class="review-exp">💡 解析: ${item.explanation}</div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // Chart.js 渲染
+        function renderChart(correct, wrong) {
+            const ctx = document.getElementById('scoreChart').getContext('2d');
+            
+            // 銷毀舊圖表 (如果有的話)
+            if (window.myChart) window.myChart.destroy();
+
+            window.myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['正確', '錯誤'],
+                    datasets: [{
+                        data: [correct, wrong],
+                        backgroundColor: ['#00e676', '#ff5252'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    cutout: '75%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+        }
+
+    </script>
 </body>
 </html>
